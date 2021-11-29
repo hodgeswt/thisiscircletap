@@ -53,6 +53,7 @@ class GameScene: SKScene {
         label.fontSize = 40
         label.position = CGPoint(x: frameWidth / 2, y: frameHeight - label.fontSize * 2)
         label.fontName = "Helvetica Neue"
+        label.zPosition = 1
         label.name = "0"
     
         self.addChild(label)
@@ -86,6 +87,7 @@ class GameScene: SKScene {
         label.fontSize = 40
         label.position = CGPoint(x: frameWidth / 2, y: frameHeight - label.fontSize * 2)
         label.fontName = "Helvetica Neue"
+        label.zPosition = 1
         label.name = "0"
     
         self.addChild(label)
@@ -148,31 +150,39 @@ class GameScene: SKScene {
             // Otherwise, we need to deal with ball touches
             // Or go back to the level menu
             for touch in touches {
-                var touched = ""
-                var touchedNode: SKNode? = nil
+                var touchedList = [SKNode]()
                 for child in self.children {
                     if child.contains(touch.location(in: self)) {
-                        touched = child.name!
-                        touchedNode = child
+                        touchedList.append(child)
                     }
                 }
                 
-                if touched == "0" {
-                    // If we touched the level name,
-                    // go back to the menu
-                    self.removeAllChildren()
-                    self.level = 0
-                    self.levelSelected = false
-                    addLevelMenu()
-                } else if touched != "" {
-                    let rate = CGFloat(Float(touched)!)
-                    touchedNode!.setScale(touchedNode!.xScale * rate)
+                if touchedList.count != 0 {
+                    // Touched node is the touched node
+                    // Unless multiple touches, then
+                    // Touched node is the back button
+                    let touchedNode = touchedList.count == 1 ? touchedList[0] : touchedList.filter{
+                        (item) -> Bool in
+                        return item.name == "0"
+                    }[0]
                     
-                    let win = checkWin()
-                    
-                    if win {
+                    if touchedNode.name == "0" {
+                        // If we touched the level name,
+                        // go back to the menu
                         self.removeAllChildren()
-                        showWin()
+                        self.level = 0
+                        self.levelSelected = false
+                        addLevelMenu()
+                    } else if touchedNode.name != "" {
+                        let rate = CGFloat(Float(touchedNode.name!)!)
+                        touchedNode.setScale(touchedNode.xScale * rate)
+                        
+                        let win = checkWin()
+                        
+                        if win {
+                            self.removeAllChildren()
+                            showWin()
+                        }
                     }
                 }
             }
@@ -184,11 +194,12 @@ class GameScene: SKScene {
         let frameHeight = self.view!.frame.height
         
         // Prepare title node
-        let label = SKLabelNode(text: "You Win!")
+        let label = SKLabelNode(text: "you win!")
         label.fontColor = .black
         label.fontSize = 40
         label.position = CGPoint(x: frameWidth / 2, y: frameHeight / 2)
         label.fontName = "Helvetica Neue"
+        label.zPosition = 1
         label.name = "0"
     
         self.addChild(label)
