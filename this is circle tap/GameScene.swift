@@ -210,7 +210,7 @@ class GameScene: SKScene {
         ballLabel.fontSize = ballLabelFontSize
         ballLabel.fontName = "Helvetica Neue"
         ballLabel.fontColor = SKColor.black
-        ballLabel.position = CGPoint(x: 50, y: frameHeight - ballLabel.frame.height * 2)
+        ballLabel.position = CGPoint(x: 75, y: frameHeight - ballLabel.frame.height * 2)
         ballLabel.zPosition = 1
         ballLabel.name = ""
         self.addChild(ballLabel)
@@ -255,6 +255,8 @@ class GameScene: SKScene {
                 return SKColor.blue
             case "green":
                 return SKColor.green
+            case "orange":
+                return SKColor.orange
             default:
                 return SKColor.black
         }
