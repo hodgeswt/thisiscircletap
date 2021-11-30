@@ -31,8 +31,14 @@ class GameScene: SKScene {
                 {
                     "name": "1",
                     "balls": [1,2,3],
-                    "scales": [1.01, 1.05, 1.1],
-                    "colors": ["black", "blue", "red"]
+                    "scales": [1.03, 1.05, 0.95],
+                    "colors": ["black", "blue", "red"],
+                    "positions": [
+                        [100, 400],
+                        [200, 500],
+                        [300, 600],
+                    ],
+                    "sizes": [50, 70, 107]
                 }
             ]
             """
@@ -300,22 +306,42 @@ class GameScene: SKScene {
                     // Touched node is the touched node
                     // Unless multiple touches, then
                     // Touched node is the back button
-                    let touchedNode = touchedList.count == 1 ? touchedList[0] : touchedList.filter{
-                        (item) -> Bool in
-                        return item.name == "0"
-                    }[0]
+                    var touchedNode: SKNode? = nil
+                    if touchedList.count == 1 {
+                        touchedNode = touchedList[0]
+                    } else {
+                        var set = false
+                        for n in touchedList {
+                            if n.name == "0" {
+                                touchedNode = n
+                                set = true
+                            }
+                        }
+                        
+                        if !set {
+                            var sizes = [CGFloat]()
+                            var nodes = [SKNode]()
+                            for n in touchedList {
+                                sizes.append(n.frame.width)
+                                nodes.append(n)
+                            }
+                            
+                            touchedNode = nodes[sizes.firstIndex(of: sizes.min()!)!]
+                        }
+                    }
                     
-                    if touchedNode.name == "0" {
+                    
+                    if touchedNode!.name == "0" {
                         // If we touched the level name,
                         // go back to the menu
                         self.removeAllChildren()
                         self.level = 0
                         self.levelSelected = false
                         addLevelMenu()
-                    } else if touchedNode.name != "" {
+                    } else if touchedNode!.name != "" {
                         // Determine the circle change
-                        let rate = CGFloat(Float(touchedNode.name!)!)
-                        touchedNode.setScale(touchedNode.xScale * rate)
+                        let rate = CGFloat(Float(touchedNode!.name!)!)
+                        touchedNode!.setScale(touchedNode!.xScale * rate)
                         
                         // Update the size labels
                         removeSizeLabel()
