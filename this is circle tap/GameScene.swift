@@ -15,11 +15,12 @@ class GameScene: SKScene {
     var JSON = ""
     var levels: [LevelData]? = nil
     var highestLevel = 1
-    
+        
     override func didMove(to view: SKView) {
         
         self.backgroundColor = .white
         
+        run(Sounds.c1)
         
         do {
             let path = Bundle.main.path(forResource: "levels", ofType: "json")
@@ -281,15 +282,19 @@ class GameScene: SKScene {
                     self.removeAllChildren()
                     self.levelSelected = true
                     showInstructions()
+                    run(Sounds.c1)
+                    
                 } else if level == "reset" {
                     let defaults = UserDefaults.standard
                     defaults.set(String(1), forKey: "highestLevel")
                     self.removeAllChildren()
                     addLevelMenu()
+                    run(Sounds.c1)
                     
                 } else if level != "0" {
                     self.removeAllChildren()
                     addLevel(levelName: level)
+                    run(Sounds.c1)
                 }
             }
         } else {
@@ -339,15 +344,17 @@ class GameScene: SKScene {
                         self.level = 0
                         self.levelSelected = false
                         addLevelMenu()
+                        run(Sounds.c1)
                     } else if touchedNode!.name != "" {
                         // Determine the circle change
+                        
                         let rate = CGFloat(Float(touchedNode!.name!)!)
                         touchedNode!.setScale(touchedNode!.xScale * rate)
                         
                         // Update the size labels
                         removeSizeLabel()
                         addSizeLabel(text: createSizeLabelContent())
-                        
+                        playSound(size: touchedNode!.frame.size.width)
                         let win = checkWin()
                         
                         if win {
@@ -357,6 +364,24 @@ class GameScene: SKScene {
                     }
                 }
             }
+        }
+    }
+    
+    func playSound(size: CGFloat) {
+        if size > 200 {
+            run(Sounds.a1)
+        } else if size > 175 {
+            run(Sounds.b1)
+        } else if size > 150 {
+            run(Sounds.c1)
+        } else if size > 125 {
+            run(Sounds.d1)
+        } else if size > 100 {
+            run(Sounds.e1)
+        } else if size > 75 {
+            run(Sounds.f1)
+        } else {
+            run(Sounds.g1)
         }
     }
     
