@@ -106,7 +106,53 @@ class GameScene: SKScene {
             let ball: Ball = Ball(radius: CGFloat(level.sizes[i]), position: CGPoint(x: level.positions[i][0], y: level.positions[i][1]), color: color)
             ball.ball.name = String(level.scales[i])
             self.addChild(ball.ball)
-                
+        }
+        
+        addSizeLabel(text: createSizeLabelContent())
+    }
+    
+    func addSizeLabel(text: String) {
+        let frameHeight = self.view!.frame.height
+        
+        let ballLabel = SKLabelNode(text: text)
+        ballLabel.numberOfLines = 0
+        let ballLabelFontSize: CGFloat = 20
+        ballLabel.fontSize = ballLabelFontSize
+        ballLabel.fontName = "Helvetica Neue"
+        ballLabel.fontColor = SKColor.black
+        ballLabel.position = CGPoint(x: 50, y: frameHeight - ballLabel.frame.height * 2)
+        ballLabel.zPosition = 1
+        ballLabel.name = ""
+        self.addChild(ballLabel)
+    }
+    
+    func createSizeLabelContent() -> String {
+        var balls = [SKNode]()
+        for child in self.children {
+            if child.name != "" && child.name != "0" {
+                balls.append(child)
+            }
+        }
+        
+        var labelText = ""
+        
+        for ball in balls {
+            let l = self.levels![self.level - 1]
+            print(l)
+            let index: Int = l.scales.firstIndex(of: Float(ball.name!)!)!
+            let color = l.colors[index]
+            labelText += color + ": " + String(Int(ball.frame.size.height)) + "\n"
+        }
+        
+        return labelText
+    }
+    
+    func removeSizeLabel() {
+        for child in self.children {
+            if child.name == "" {
+                child.removeFromParent()
+                break
+            }
         }
     }
     
@@ -174,8 +220,13 @@ class GameScene: SKScene {
                         self.levelSelected = false
                         addLevelMenu()
                     } else if touchedNode.name != "" {
+                        // Determine the circle change
                         let rate = CGFloat(Float(touchedNode.name!)!)
                         touchedNode.setScale(touchedNode.xScale * rate)
+                        
+                        // Update the size labels
+                        removeSizeLabel()
+                        addSizeLabel(text: createSizeLabelContent())
                         
                         let win = checkWin()
                         
@@ -208,7 +259,7 @@ class GameScene: SKScene {
     func checkWin() -> Bool {
         var sizes = [Double]()
         for child in self.children {
-            if child.name != "0" {
+            if child.name != "0" && child.name != "" {
                 let area = child.frame.size.height
                 sizes.append(Double(area))
             }
@@ -221,6 +272,9 @@ class GameScene: SKScene {
         }
         s /= Double(sizes.count)
         s = sqrt(s)
+        
+        print(sizes)
+        print(s)
         
         var win = true
         for size in sizes {
