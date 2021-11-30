@@ -14,10 +14,12 @@ class GameScene: SKScene {
     var levelSelected = false
     var JSON = ""
     var levels: [LevelData]? = nil
+    var highestLevel = 1
     
     override func didMove(to view: SKView) {
         
         self.backgroundColor = .white
+        
         
         do {
             let path = Bundle.main.path(forResource: "levels", ofType: "json")
@@ -43,6 +45,16 @@ class GameScene: SKScene {
     }
     
     func addLevelMenu() {
+        
+        let defaults = UserDefaults.standard
+        if let storedValue = defaults.string(forKey: "highestLevel") {
+            // If there is a stored value, get it
+            self.highestLevel = Int(storedValue)!
+            print(self.highestLevel)
+        } else {
+            // If there's no stored value, set it
+            defaults.set("1", forKey: "highestLevel")
+        }
         
         let frameWidth = self.view!.frame.width
         let frameHeight = self.view!.frame.height
@@ -76,15 +88,42 @@ class GameScene: SKScene {
             let p = CGPoint(x: frameWidth / 2, y: frameHeight - label.fontSize * 2 - (fontSize * 2 * increment))
             // Add a label for each level
             let levelLabel = SKLabelNode(text: level.name)
-            levelLabel.name = level.name
+            if Int(level.name)! > self.highestLevel {
+                // If we haven't unlocked this level yet,
+                // Gray it out and make it unclickable
+                levelLabel.name = "0"
+                levelLabel.fontColor = .gray
+            } else {
+                levelLabel.name = level.name
+                levelLabel.fontColor = .black
+            }
             levelLabel.fontName = "Helvetica Neue"
             levelLabel.fontSize = fontSize
-            levelLabel.fontColor = .black
             levelLabel.position = p
             increment += 1
             
             self.addChild(levelLabel)
         }
+        
+        let resetButton = SKLabelNode(text: "reset progress")
+        resetButton.fontColor = .black
+        resetButton.fontSize = 20
+        resetButton.position = CGPoint(x: frameWidth / 2, y: resetButton.frame.height * 2)
+        resetButton.fontName = "Helvetica Neue"
+        resetButton.zPosition = 1
+        resetButton.name = "reset"
+        
+        self.addChild(resetButton)
+        
+        let gameTitle = SKLabelNode(text: "this is circle tap")
+        gameTitle.fontColor = .black
+        gameTitle.fontSize = 10
+        gameTitle.position = CGPoint(x: frameWidth / 2, y: resetButton.frame.height * 2 + gameTitle.frame.height * 2)
+        gameTitle.fontName = "Helvetica Neue"
+        gameTitle.zPosition = 1
+        gameTitle.name = "0"
+        
+        self.addChild(gameTitle)
     }
     
     func addLevel(levelName: String) {
@@ -138,7 +177,11 @@ class GameScene: SKScene {
         let instructionsText = """
         tap the circles to change their size.
         continue tapping until they're all within
-        two size points of each other
+        two size points of each other.
+        
+        tap the level name to go back.
+        tap the 'you win!' text to go back.
+        tap 'instructions' above to go back.
         """
         let instructions = SKLabelNode(text: instructionsText)
         instructions.fontColor = SKColor.black
@@ -179,7 +222,6 @@ class GameScene: SKScene {
         
         for ball in balls {
             let l = self.levels![self.level - 1]
-            print(l)
             let index: Int = l.scales.firstIndex(of: Float(ball.name!)!)!
             let color = l.colors[index]
             labelText += color + ": " + String(Int(ball.frame.size.height)) + "\n"
@@ -232,6 +274,12 @@ class GameScene: SKScene {
                     self.removeAllChildren()
                     self.levelSelected = true
                     showInstructions()
+                } else if level == "reset" {
+                    let defaults = UserDefaults.standard
+                    defaults.set(String(1), forKey: "highestLevel")
+                    self.removeAllChildren()
+                    addLevelMenu()
+                    
                 } else if level != "0" {
                     self.removeAllChildren()
                     addLevel(levelName: level)
@@ -286,6 +334,10 @@ class GameScene: SKScene {
     }
     
     func showWin() {
+        // Set our highest won level
+        let defaults = UserDefaults.standard
+        defaults.set(String(self.level + 1), forKey: "highestLevel")
+        
         let frameWidth = self.view!.frame.width
         let frameHeight = self.view!.frame.height
         
@@ -317,9 +369,6 @@ class GameScene: SKScene {
         }
         s /= Double(sizes.count)
         s = sqrt(s)
-        
-        print(sizes)
-        print(s)
         
         var win = true
         for size in sizes {
