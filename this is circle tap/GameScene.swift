@@ -58,6 +58,16 @@ class GameScene: SKScene {
     
         self.addChild(label)
         
+        let instructions = SKLabelNode(text: "instructions")
+        instructions.fontColor = .black
+        instructions.fontSize = 20
+        instructions.position = CGPoint(x: frameWidth / 2, y: frameHeight - instructions.fontSize * 5)
+        instructions.fontName = "Helvetica Neue"
+        instructions.zPosition = 1
+        instructions.name = "instructions"
+    
+        self.addChild(instructions)
+        
         var increment: CGFloat = 1.0
         
         for level in levels! {
@@ -109,6 +119,37 @@ class GameScene: SKScene {
         }
         
         addSizeLabel(text: createSizeLabelContent())
+    }
+    
+    func showInstructions() {
+        let frameWidth = self.view!.frame.width
+        let frameHeight = self.view!.frame.height
+        
+        let label = SKLabelNode(text: "instructions")
+        label.fontColor = .black
+        label.fontSize = 40
+        label.position = CGPoint(x: frameWidth / 2, y: frameHeight - label.fontSize * 2)
+        label.fontName = "Helvetica Neue"
+        label.zPosition = 1
+        label.name = "0"
+    
+        self.addChild(label)
+        
+        let instructionsText = """
+        tap the circles to change their size.
+        continue tapping until they're all within
+        two size points of each other
+        """
+        let instructions = SKLabelNode(text: instructionsText)
+        instructions.fontColor = SKColor.black
+        instructions.fontSize = 20
+        instructions.numberOfLines = 0
+        instructions.position = CGPoint(x: frameWidth / 2, y: frameHeight - instructions.frame.height - 100)
+        instructions.fontName = "Helvetica Neue"
+        instructions.zPosition = 1
+        instructions.name = "0"
+    
+        self.addChild(instructions)
     }
     
     func addSizeLabel(text: String) {
@@ -187,7 +228,11 @@ class GameScene: SKScene {
                 // If we touched a level
                 // And not the word "levels",
                 // Clear the screen and add the level
-                if level != "0" {
+                if level == "instructions" {
+                    self.removeAllChildren()
+                    self.levelSelected = true
+                    showInstructions()
+                } else if level != "0" {
                     self.removeAllChildren()
                     addLevel(levelName: level)
                 }
@@ -284,9 +329,5 @@ class GameScene: SKScene {
         }
         
         return win
-    }
-    
-    override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
     }
 }
