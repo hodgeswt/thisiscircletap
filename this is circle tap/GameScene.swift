@@ -56,7 +56,6 @@ class GameScene: SKScene {
         if let storedValue = defaults.string(forKey: "highestLevel") {
             // If there is a stored value, get it
             self.highestLevel = Int(storedValue)!
-            print(self.highestLevel)
         } else {
             // If there's no stored value, set it
             defaults.set("1", forKey: "highestLevel")
