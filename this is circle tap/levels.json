@@ -27,7 +27,7 @@
     {
         "name": "3",
         "balls": [1,2,3,4],
-        "scales": [1.5, 1.03, 1.03, 1.05],
+        "scales": [1.5, 1.03, 1.029, 1.05],
         "colors": ["black", "blue", "red", "green"],
         "positions": [
             [100, 400],

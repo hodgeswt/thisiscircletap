@@ -186,7 +186,6 @@ class GameScene: SKScene {
         two size points of each other.
         
         tap the level name to go back.
-        tap the 'you win!' text to go back.
         tap 'instructions' above to go back.
         """
         let instructions = SKLabelNode(text: instructionsText)
@@ -401,8 +400,17 @@ class GameScene: SKScene {
         label.fontName = "Helvetica Neue"
         label.zPosition = 1
         label.name = "0"
+        
+        let backLabel = SKLabelNode(text: "back")
+        backLabel.fontColor = .black
+        backLabel.fontSize = 30
+        backLabel.position = CGPoint(x: frameWidth / 2, y: frameHeight / 2 - label.frame.height)
+        backLabel.fontName = "Helvetica Neue"
+        backLabel.zPosition = 1
+        backLabel.name = "0"
     
         self.addChild(label)
+        self.addChild(backLabel)
     }
     
     func checkWin() -> Bool {
